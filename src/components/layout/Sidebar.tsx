@@ -4,30 +4,29 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useStore } from '@/store/useStore'
+import { signOut } from 'next-auth/react'
 import {
   LayoutDashboard, Package, QrCode, Upload, ClipboardList,
   Users, BarChart3, Bell, Settings, Package2, ChevronLeft,
-  History, MapPin, FileText, LogOut,
+  MapPin, FileText, LogOut,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 
 const navItems = [
   {
     group: 'Main',
+    adminOnly: false,
     items: [
-      { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { href: '/materials', label: 'Materials', icon: Package },
-      { href: '/scanner', label: 'QR Scanner', icon: QrCode },
-      { href: '/requests', label: 'Requests', icon: ClipboardList },
+      { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, adminOnly: false },
+      { href: '/materials', label: 'Materials', icon: Package, adminOnly: false },
+      { href: '/scanner', label: 'QR Scanner', icon: QrCode, adminOnly: false },
+      { href: '/requests', label: 'Requests', icon: ClipboardList, adminOnly: false },
     ],
   },
   {
     group: 'Management',
+    adminOnly: false,
     items: [
       { href: '/upload', label: 'Stock Upload', icon: Upload, adminOnly: true },
-      { href: '/inventory', label: 'Issue History', icon: History },
-      { href: '/locations', label: 'Rack Locations', icon: MapPin, adminOnly: true },
       { href: '/reports', label: 'Reports', icon: FileText, adminOnly: true },
     ],
   },
@@ -35,10 +34,9 @@ const navItems = [
     group: 'Admin',
     adminOnly: true,
     items: [
-      { href: '/analytics', label: 'Analytics', icon: BarChart3, adminOnly: true },
       { href: '/users', label: 'Users', icon: Users, adminOnly: true },
-      { href: '/notifications', label: 'Notifications', icon: Bell },
-      { href: '/settings', label: 'Settings', icon: Settings, adminOnly: true },
+      { href: '/notifications', label: 'Notifications', icon: Bell, adminOnly: false },
+      { href: '/settings', label: 'Settings', icon: Settings, adminOnly: false },
     ],
   },
 ]
@@ -47,17 +45,13 @@ export default function Sidebar() {
   const pathname = usePathname()
   const { sidebarOpen, toggleSidebar, profile } = useStore()
   const isAdmin = profile?.role === 'admin'
-  const supabase = createClient()
-  const router = useRouter()
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
+  const handleLogout = () => {
+    signOut({ callbackUrl: '/login' })
   }
 
   return (
     <>
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-20 lg:hidden" onClick={toggleSidebar} />
       )}
@@ -66,7 +60,6 @@ export default function Sidebar() {
         'fixed top-0 left-0 h-full z-30 flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 transition-all duration-300',
         sidebarOpen ? 'w-64' : 'w-16',
       )}>
-        {/* Logo */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
           <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0">
             <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -82,7 +75,6 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4 px-3 scrollbar-thin">
           {navItems.map((group) => {
             if (group.adminOnly && !isAdmin) return null
@@ -117,18 +109,17 @@ export default function Sidebar() {
           })}
         </nav>
 
-        {/* User profile + logout */}
         <div className="border-t border-slate-200 dark:border-slate-700 p-3 flex-shrink-0">
           {sidebarOpen ? (
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
                 <span className="text-white text-xs font-semibold">
-                  {profile?.full_name?.charAt(0) || profile?.email?.charAt(0) || 'U'}
+                  {profile?.name?.charAt(0) || profile?.email?.charAt(0) || 'U'}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
-                  {profile?.full_name || 'User'}
+                  {profile?.name || 'User'}
                 </p>
                 <p className="text-[10px] text-slate-400 capitalize">{profile?.role || 'designer'}</p>
               </div>

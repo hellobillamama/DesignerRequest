@@ -1,11 +1,18 @@
 import { create } from 'zustand'
-import type { Profile } from '@/types/database'
+
+interface UserProfile {
+  email: string
+  name: string
+  image?: string
+  role: string
+  department: string
+}
 
 interface AppStore {
-  profile: Profile | null
+  profile: UserProfile | null
   sidebarOpen: boolean
   notifications: number
-  setProfile: (p: Profile | null) => void
+  setProfile: (p: UserProfile | null) => void
   setSidebarOpen: (v: boolean) => void
   setNotifications: (n: number) => void
   toggleSidebar: () => void

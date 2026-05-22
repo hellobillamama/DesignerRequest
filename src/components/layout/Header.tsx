@@ -27,7 +27,6 @@ export default function Header({ title }: { title?: string }) {
       'fixed top-0 right-0 h-16 z-10 flex items-center gap-3 px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 transition-all duration-300',
       sidebarOpen ? 'left-64' : 'left-16'
     )}>
-      {/* Mobile menu toggle */}
       <button onClick={toggleSidebar}
         className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors lg:hidden">
         <Menu className="w-5 h-5" />
@@ -37,7 +36,6 @@ export default function Header({ title }: { title?: string }) {
         <h1 className="font-semibold text-slate-900 dark:text-white text-sm hidden md:block">{title}</h1>
       )}
 
-      {/* Global search */}
       <form onSubmit={handleSearch} className="flex-1 max-w-md ml-2">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -52,7 +50,6 @@ export default function Header({ title }: { title?: string }) {
       </form>
 
       <div className="ml-auto flex items-center gap-1">
-        {/* Notifications */}
         <Link href="/notifications"
           className="relative p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <Bell className="w-5 h-5" />
@@ -61,7 +58,6 @@ export default function Header({ title }: { title?: string }) {
           )}
         </Link>
 
-        {/* Theme toggle */}
         <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}

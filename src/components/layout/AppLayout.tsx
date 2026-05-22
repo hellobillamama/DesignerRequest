@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 import { useStore } from '@/store/useStore'
-import { createClient } from '@/lib/supabase/client'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import { cn } from '@/lib/utils'
@@ -14,18 +14,19 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children, title }: AppLayoutProps) {
   const { sidebarOpen, setProfile } = useStore()
-  const supabase = createClient()
+  const { data: session } = useSession()
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-        if (data) setProfile(data)
-      }
+    if (session?.user) {
+      setProfile({
+        email: session.user.email || '',
+        name: session.user.name || '',
+        image: session.user.image || undefined,
+        role: (session.user as Record<string, unknown>).role as string || 'designer',
+        department: (session.user as Record<string, unknown>).department as string || '',
+      })
     }
-    fetchProfile()
-  }, [supabase, setProfile])
+  }, [session, setProfile])
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0a0f1c]">
